@@ -121,3 +121,100 @@ class SimulatedAnnealing:
         return self.best_solution,self.best_soluion_cost
      
             
+            
+class GeneticAlgorithm:
+    def __init__(self,city_coordinates,generation_count,population_size):
+        self.city_coordinates = city_coordinates.copy()
+        self.generation_count= generation_count
+        self.population_size=population_size
+
+    def create_initial_population(self,size):
+        initial_population = []
+        city_cordinates=self.city_coordinates.copy()
+        for i in range(size):
+            solution=[]
+            for city in self.city_coordinates.keys():
+                random_index = random.randint(0,len(city_cordinates)-1) 
+                solution.append(list(city_cordinates.keys())[random_index])
+                city_cordinates.pop(list(city_cordinates.keys())[random_index]) 
+            initial_population.append(solution)
+            city_cordinates=self.city_coordinates.copy()      
+        return initial_population
+            
+    def get_fitness_score(self,solution):
+        cost = 0
+        for current_city_index in range(len(solution)):
+            if ( current_city_index+1<len(solution)):
+                in_between_cost = get_huristic_value(self.city_coordinates[solution[current_city_index]],self.city_coordinates[solution[current_city_index+1]])
+                cost+=in_between_cost
+        return 1/cost
+       
+    def cross_over(self,parents):
+        parent_one=parents[0]
+        parent_two=parents[1]
+        solution_length = len(parent_one)
+        offspring1=parent_one[:solution_length//2]
+        offspring2 = parent_two[:solution_length//2]
+        
+        for gene in parent_two:
+            if gene not in offspring1:
+                offspring1.append(gene)
+        for gene in parent_one:
+            if gene not in offspring2:
+                offspring2.append(gene)
+        return [offspring1,offspring2]
+
+    def mutate_solution(self,solution):
+        solution_length=len(solution)
+        temp_one = random.randint(0,solution_length-1)
+        temp_two = random.randint(0,solution_length-1)
+        temp = solution[temp_one]
+        solution[temp_one]=solution[temp_two]
+        solution[temp_two]=temp
+        return solution     
+        
+    def start(self):
+        temprature = 60
+        final_temprature=10
+        self.best_solution=None
+        self.best_solution_fitness_score = 0
+        
+        population = self.create_initial_population(self.population_size)
+        for count in range(self.generation_count):
+            tested_population_detail = []
+            for solution in population:
+                score = self.get_fitness_score(solution)
+                tested_population_detail.append([score,solution])
+            tested_population_detail.sort()
+            
+            top_solutions_detail = tested_population_detail[-100:]
+            temp_best_solution=top_solutions_detail[-1]
+            
+            if(temp_best_solution[0]>self.best_solution_fitness_score):
+                self.best_solution=temp_best_solution[1]
+                self.best_solution_fitness_score=temp_best_solution[0]
+                temprature=60
+            else:
+                temprature-=10
+                if(temprature<10):
+                    break
+            # print(f"generation {count} best {1/temp_best_solution[0]}")
+    
+            best_solutions = []
+            for solution in top_solutions_detail:
+                best_solutions.append(solution[1])
+            
+            population=[]
+            for size in range(self.population_size//2):
+                parent_one = best_solutions[ random.randint(0,len(best_solutions)-1)]
+                parent_two = best_solutions[ random.randint(0,len(best_solutions)-1)]
+                
+                offsprings = self.cross_over([parent_one,parent_two])
+                offsprings[0]=self.mutate_solution(offsprings[0])
+                offsprings[1]=self.mutate_solution(offsprings[1])
+                population.append(offsprings[0])
+                population.append(offsprings[1])
+
+        return self.best_solution,1/self.best_solution_fitness_score
+                
+   
