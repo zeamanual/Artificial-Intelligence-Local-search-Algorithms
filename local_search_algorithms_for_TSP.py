@@ -250,3 +250,29 @@ def get_huristic_value(location_one,location_two):
     distance_between = RADIUS * c
     return distance_between
 
+
+def main():
+    parser = argparse.ArgumentParser(description="Get file and algorithm name")
+    parser.add_argument('--algorithm',help='Enter the name of the algorithm to use such as ga, hl, sa')
+    parser.add_argument('--file',help='Enter the name of the file to read from')
+    arguments = parser.parse_args()
+
+    filename = arguments.file
+    algorithm = arguments.algorithm
+    load_data(filename)
+    global city_coordinates
+    if(algorithm=='ga'):
+        genetic_algorithm = GeneticAlgorithm(city_coordinates,20,200)
+        result = genetic_algorithm.start()
+        print(result)
+       
+    elif(algorithm=='hl'):
+        hill_climbing_algorithm = HillClimbing(city_coordinates)
+        result = hill_climbing_algorithm.start()
+        print(result)
+    elif(algorithm=='sa'):
+        simulated_annealing = SimulatedAnnealing(city_coordinates)
+        result = simulated_annealing.start()
+        print(result)
+    
+main()
