@@ -217,4 +217,36 @@ class GeneticAlgorithm:
 
         return self.best_solution,1/self.best_solution_fitness_score
                 
-   
+        
+
+ #load all data from file
+def load_data(filename):
+    
+    #Reading contents of city coordinates file
+    city_coordinate_file= open(filename)
+    global city_coordinates
+    city_coordinates={}
+    read_line=city_coordinate_file.readline()
+    while(read_line):
+        read_line=read_line.split(',')
+        city_coordinates[read_line[0]]=[float(read_line[1]),float(read_line[2])]
+        read_line=city_coordinate_file.readline()
+    city_coordinate_file.close()
+
+
+def get_huristic_value(location_one,location_two):
+    RADIUS=6373.0
+    latitude_one = math.radians(location_one[0])
+    longitude_one = math.radians(location_one[1])
+    latitude_two = math.radians(location_two[0])
+    longitude_two = math.radians(location_two[1])
+
+    diffrence_in_longitude = longitude_two-longitude_one
+    diffrence_in_latitude = latitude_two -latitude_one
+
+    a = math.pow((math.sin(diffrence_in_latitude/2)),2) + math.cos(latitude_one)*math.cos(latitude_two)*math.pow((math.sin(diffrence_in_longitude/2)),2)
+    c = 2*math.atan2(math.sqrt(a),math.sqrt(1-a))
+
+    distance_between = RADIUS * c
+    return distance_between
+
