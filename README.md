@@ -1,4 +1,4 @@
-Hill Climbing, Simulated Annealing and Genetic Search Algorithms implementation in python
+Local Search (Hill Climbing, Simulated Annealing and Genetic Search) Algorithms implementation in python
 
 "local_search_algorithms_for_knapsack_problem.py" includes the implementation of all three algorithms for the knapsack problem using python class for each
 
